@@ -24,8 +24,38 @@ resource "azurerm_virtual_network" "mtc-network" {
   resource_group_name = azurerm_resource_group.mtc-rg.name
   location            = azurerm_resource_group.mtc-rg.location
   tags = {
-    "environment" = "dev"   
+    "environment" = "dev"
   }
   address_space = ["10.123.0.0/16"]
 }
 
+resource "azurerm_subnet" "mtc-subnet" {
+  name                 = "mtc-subnet"
+  resource_group_name  = azurerm_resource_group.mtc-rg.name
+  virtual_network_name = azurerm_virtual_network.mtc-network.name
+  address_prefixes     = ["10.123.1.0/27"]
+}
+
+resource "azurerm_network_security_group" "mtc-nsg" {
+  name                = "mtc-network-security-group"
+  resource_group_name = azurerm_resource_group.mtc-rg.name
+  location            = azurerm_resource_group.mtc-rg.location
+  tags = {
+    "environment" = "dev"
+  }
+}
+
+
+resource "azurerm_network_security_rule" "mtc-network-security-rule" {
+  name                        = "mtc-nsr"
+  priority                    = 100
+  direction                   = "Inbound"
+  access                      = "Allow"
+  protocol                    = "*"
+  source_port_range           = "*"
+  destination_port_range      = "*"
+  source_address_prefix       = "*"
+  destination_address_prefix  = "*"
+  resource_group_name         = azurerm_resource_group.mtc-rg.name
+  network_security_group_name = azurerm_network_security_group.mtc-nsg.name
+}
