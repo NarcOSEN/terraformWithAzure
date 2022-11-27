@@ -9,9 +9,9 @@ terraform {
 provider "azurerm" {
   features {}
 }
-    
+
 resource "azurerm_resource_group" "mtc-rg" {
-  name     = "mtc-resources"
+  name     = "app-dev-rg"
   location = "East Us"
   tags = {
     environment = "dev"
