@@ -65,3 +65,32 @@ resource "azurerm_subnet_network_security_group_association" "mtc-nsg-associatio
   subnet_id                 = azurerm_subnet.mtc-subnet.id
   network_security_group_id = azurerm_network_security_group.mtc-nsg.id
 }
+
+
+resource "azurerm_public_ip" "mtc-public-ip" {
+  name                = "mtc-public-ip"
+  resource_group_name = azurerm_resource_group.mtc-rg.name
+  location            = azurerm_resource_group.mtc-rg.location
+  allocation_method   = "Static"
+
+  tags = {
+    environment = "dev"
+  }
+}
+
+
+resource "azurerm_network_interface" "mtc-net-interf" {
+  name                = "mtc-nic"
+  resource_group_name = azurerm_resource_group.mtc-rg.name
+  location            = azurerm_resource_group.mtc-rg.location
+  ip_configuration {
+    name                          = "internal"
+    subnet_id                     = azurerm_subnet.mtc-subnet.id
+    private_ip_address_allocation = "Dynamic"
+    public_ip_address_id          = azurerm_public_ip.mtc-public-ip.id
+
+  }
+  tags = {
+      environment = "dev"
+    }
+}
