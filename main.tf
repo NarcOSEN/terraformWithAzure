@@ -1,3 +1,4 @@
+#defining the required providers
 terraform {
   required_providers {
     azurerm = {
@@ -10,6 +11,8 @@ provider "azurerm" {
   features {}
 }
 
+
+#defining the resource group
 resource "azurerm_resource_group" "mtc-rg" {
   name     = "app-dev-rg"
   location = "East Us"
@@ -18,7 +21,7 @@ resource "azurerm_resource_group" "mtc-rg" {
   }
 }
 
-
+#defining the virtual network
 resource "azurerm_virtual_network" "mtc-network" {
   name                = "mtc-network"
   resource_group_name = azurerm_resource_group.mtc-rg.name
@@ -29,6 +32,8 @@ resource "azurerm_virtual_network" "mtc-network" {
   address_space = ["10.123.0.0/16"]
 }
 
+
+#defining a subnet of this virtual network
 resource "azurerm_subnet" "mtc-subnet" {
   name                 = "mtc-subnet"
   resource_group_name  = azurerm_resource_group.mtc-rg.name
@@ -36,6 +41,8 @@ resource "azurerm_subnet" "mtc-subnet" {
   address_prefixes     = ["10.123.1.0/27"]
 }
 
+
+#defining a network security group attached to this resource group
 resource "azurerm_network_security_group" "mtc-nsg" {
   name                = "mtc-network-security-group"
   resource_group_name = azurerm_resource_group.mtc-rg.name
@@ -45,7 +52,7 @@ resource "azurerm_network_security_group" "mtc-nsg" {
   }
 }
 
-
+#defining a network security rule
 resource "azurerm_network_security_rule" "mtc-network-security-rule" {
   name                        = "mtc-nsr"
   priority                    = 100
@@ -61,12 +68,15 @@ resource "azurerm_network_security_rule" "mtc-network-security-rule" {
 }
 
 
+#defining a network security group association 
+#in other words, linking the network security group and the subnet
 resource "azurerm_subnet_network_security_group_association" "mtc-nsg-association" {
   subnet_id                 = azurerm_subnet.mtc-subnet.id
   network_security_group_id = azurerm_network_security_group.mtc-nsg.id
 }
 
 
+#defining a public IP.
 resource "azurerm_public_ip" "mtc-public-ip" {
   name                = "mtc-public-ip"
   resource_group_name = azurerm_resource_group.mtc-rg.name
@@ -78,7 +88,7 @@ resource "azurerm_public_ip" "mtc-public-ip" {
   }
 }
 
-
+#defining a network interface (I think this is the equivalent of a physical network interface card)
 resource "azurerm_network_interface" "mtc-net-interf" {
   name                = "mtc-nic"
   resource_group_name = azurerm_resource_group.mtc-rg.name
@@ -91,6 +101,34 @@ resource "azurerm_network_interface" "mtc-net-interf" {
 
   }
   tags = {
-      environment = "dev"
-    }
+    environment = "dev"
+  }
+}
+
+
+
+#Creating the actual VM and attaching the required stuff to it
+resource "azurerm_virtual_machine" "mtc-vm" {
+  name                  = "mtc-vm"
+  resource_group_name   = azurerm_resource_group.mtc-rg.name
+  location              = azurerm_resource_group.mtc-rg.location
+  network_interface_ids = [azurerm_network_interface.mtc-net-interf.id]
+  vm_size               = "Standard_B1s"
+
+  storage_image_reference {
+    publisher = "Canonical"
+    offer     = "UbuntuServer"
+    sku       = "18.04-LTS"
+    version   = "latest"
+  }
+  storage_os_disk {
+    caching       = "ReadWrite"
+    create_option = "true"
+    name          = "disk-os"
+  }
+  os_profile {
+    computer_name  = "dev-hostname"
+    admin_username = "admin"
+    admin_password = "Password1234!"
+  }
 }
