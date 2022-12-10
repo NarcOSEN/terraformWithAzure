@@ -108,27 +108,27 @@ resource "azurerm_network_interface" "mtc-net-interf" {
 
 
 #Creating the actual VM and attaching the required stuff to it
-resource "azurerm_virtual_machine" "mtc-vm" {
-  name                  = "mtc-vm"
+resource "azurerm_linux_virtual_machine" "mtc-vm" {
+  name                  = "VM01"
   resource_group_name   = azurerm_resource_group.mtc-rg.name
   location              = azurerm_resource_group.mtc-rg.location
+  size                  = "Standard_F2"
+  admin_username        = "adminuser"
   network_interface_ids = [azurerm_network_interface.mtc-net-interf.id]
-  vm_size               = "Standard_B1s"
+  admin_ssh_key {
+    username   = "adminuser"
+    public_key = file("/home/narcosen/id_rsa.pub")
+  }
 
-  storage_image_reference {
+  os_disk {
+    caching              = "ReadWrite"
+    storage_account_type = "Standard_LRS"
+  }
+
+  source_image_reference {
     publisher = "Canonical"
     offer     = "UbuntuServer"
-    sku       = "18.04-LTS"
+    sku       = "16.04-LTS"
     version   = "latest"
-  }
-  storage_os_disk {
-    caching       = "ReadWrite"
-    create_option = "true"
-    name          = "disk-os"
-  }
-  os_profile {
-    computer_name  = "dev-hostname"
-    admin_username = "admin"
-    admin_password = "Password1234!"
   }
 }
