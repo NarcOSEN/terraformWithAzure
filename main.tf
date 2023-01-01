@@ -112,9 +112,11 @@ resource "azurerm_linux_virtual_machine" "mtc-vm" {
   name                  = "VM01"
   resource_group_name   = azurerm_resource_group.mtc-rg.name
   location              = azurerm_resource_group.mtc-rg.location
-  size                  = "Standard_F2"
+  size                  = "Standard_D2as_v4"
   admin_username        = "adminuser"
   network_interface_ids = [azurerm_network_interface.mtc-net-interf.id]
+  priority              = "Spot"
+  eviction_policy       = "Deallocate"
   admin_ssh_key {
     username   = "adminuser"
     public_key = file("/home/narcosen/id_rsa.pub")
