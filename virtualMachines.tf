@@ -17,7 +17,6 @@ resource "azurerm_network_interface" "mtc-net-interf" {
 }
 
 
-
 #Creating the actual VM and attaching the required stuff to it
 resource "azurerm_linux_virtual_machine" "mtc-vm" {
   name                  = "VM01"
@@ -32,7 +31,7 @@ resource "azurerm_linux_virtual_machine" "mtc-vm" {
     username   = "adminuser"
     public_key = file("/home/narcosen/id_rsa.pub")
   }
-
+  custom_data = filebase64("customData.tpl")
   os_disk {
     caching              = "ReadWrite"
     storage_account_type = "Standard_LRS"
@@ -45,3 +44,4 @@ resource "azurerm_linux_virtual_machine" "mtc-vm" {
     version   = "latest"
   }
 }
+
