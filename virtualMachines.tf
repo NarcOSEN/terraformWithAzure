@@ -104,6 +104,7 @@ resource "azurerm_linux_virtual_machine" "monitoring-vm-002" {
 
 
 ###  VM-003  ####
+#test
 
 
 #defining a network interface (I think this is the equivalent of a physical network interface card)
