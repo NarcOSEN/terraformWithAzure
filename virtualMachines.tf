@@ -32,7 +32,7 @@ resource "azurerm_linux_virtual_machine" "monitoring-vm-001" {
   eviction_policy       = "Deallocate"
   admin_ssh_key {
     username   = "adminuser"
-    public_key = file("/home/narcosen/.ssh/id_rsa.pub")
+    public_key = file("/home/narcis/.ssh/azure_vm.pub")
   }
   custom_data = filebase64("customData.tpl")
   os_disk {
@@ -83,7 +83,7 @@ resource "azurerm_linux_virtual_machine" "monitoring-vm-002" {
   eviction_policy       = "Deallocate"
   admin_ssh_key {
     username   = "adminuser"
-    public_key = file("/home/narcosen/.ssh/id_rsa.pub")
+    public_key = file("/home/narcis/.ssh/azure_vm.pub")
   }
   custom_data = filebase64("customData.tpl")
   os_disk {
@@ -135,7 +135,7 @@ resource "azurerm_linux_virtual_machine" "monitoring-vm-003" {
   eviction_policy       = "Deallocate"
   admin_ssh_key {
     username   = "adminuser"
-    public_key = file("/home/narcosen/.ssh/id_rsa.pub")
+    public_key = file("/home/narcis/.ssh/azure_vm.pub")
   }
   custom_data = filebase64("customData.tpl")
   os_disk {
